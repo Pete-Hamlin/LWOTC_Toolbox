@@ -2,11 +2,11 @@
 //  FILE:    UIAfterAction_LW
 //  AUTHOR:  Amineri / Long War Studios
 //  PURPOSE: This file extends the post-mission squad view to support larger squads.
-//--------------------------------------------------------------------------------------- 
+//---------------------------------------------------------------------------------------
 
 class UIAfterAction_LW extends UIAfterAction config(LW_Toolbox);
 
-`include(LW_Toolbox\Src\LW_Toolbox.uci)
+`include(LWOTC_Toolbox\Src\LW_Toolbox.uci)
 
 var bool m_bBackRowActive;
 var UIList m_kSlotList2;
@@ -87,9 +87,9 @@ simulated function CreatePanels()
 //function StartPostMissionCinematic()
 //{
 	//local int PawnIndex;
-	//local XComLevelActor AvengerSunShade;	
+	//local XComLevelActor AvengerSunShade;
 	//local SkeletalMeshActor CineDummy;
-	//local SkeletalMeshActor IterateActor;	
+	//local SkeletalMeshActor IterateActor;
 	//local XComGameState_MissionSite MissionState;
 	//local XComGameStateHistory History;
 		//
@@ -100,13 +100,13 @@ simulated function CreatePanels()
 	//
 	////Turn off the sunshade object that prevents the directional light from affecting the avenger side view
 	//foreach AllActors(class'XComLevelActor', AvengerSunShade)
-	//{		
+	//{
 		//if(AvengerSunShade.Tag == 'AvengerSunShade')
 		//{
 			//AvengerSunShade.StaticMeshComponent.bCastHiddenShadow = false;
 			//AvengerSunShade.ReattachComponent(AvengerSunShade.StaticMeshComponent);
 			//break;
-		//}				
+		//}
 	//}
 //
 	//foreach AllActors(class'SkeletalMeshActor',   IterateActor)
@@ -133,12 +133,12 @@ simulated function CreatePanels()
 			//if(UnitPawnsCinematic[PawnIndex] != none)
 			//{
 				//UnitPawnsCinematic[PawnIndex].Mesh.bUpdateSkelWhenNotRendered = true;
-				//UnitPawnsCinematic[PawnIndex].SetBase(CineDummy);				
+				//UnitPawnsCinematic[PawnIndex].SetBase(CineDummy);
 				//UnitPawnsCinematic[PawnIndex].SetupForMatinee(, true);
 				//SetPawnVariable(UnitPawnsCinematic[PawnIndex], string(PawnIndex+1));
 			//}
 		//}
-	//}	
+	//}
 //
 	//WorldInfo.MyLocalEnvMapManager.SetEnableCaptures(true);
 //
@@ -146,7 +146,7 @@ simulated function CreatePanels()
 //
 	//WorldInfo.RemoteEventListeners.AddItem(self);
 //
-	//History = `XCOMHISTORY;	
+	//History = `XCOMHISTORY;
 	//MissionState = XComGameState_MissionSite(History.GetGameStateForObjectID(XComHQ.MissionRef.ObjectID));
 //
 	//if(!MissionState.GetMissionSource().bRequiresSkyrangerTravel)
@@ -167,9 +167,9 @@ simulated function UpdateData()
 	local int SlotIndex;	//Index into the list of places where a soldier can stand in the after action scene, from left to right
 	local int SquadIndex;	//Index into the HQ's squad array, containing references to unit state objects
 	local int ListItemIndex;//Index into the array of list items the player can interact with to view soldier status and promote
-	local UIAfterAction_ListItem ListItem;	
+	local UIAfterAction_ListItem ListItem;
 
-	bMakePawns = UnitPawns.Length == 0;//We only need to create pawns if we have never had them before	
+	bMakePawns = UnitPawns.Length == 0;//We only need to create pawns if we have never had them before
 
 	//front row
 	ListItemIndex = 0;
@@ -209,7 +209,7 @@ simulated function UpdateData()
 	{
 		SquadIndex = 6 + SlotListOrder[SlotIndex];
 		if (SquadIndex < XComHQ.Squad.Length)
-		{	
+		{
 			if (XComHQ.Squad[SquadIndex].ObjectID > 0)
 			{
 				if (bMakePawns)
@@ -263,7 +263,7 @@ simulated function UpdateData()
 	//{
 		//SquadIndex = SlotListOrder[SlotIndex];
 		//if (SquadIndex < XComHQ.Squad.Length)
-		//{	
+		//{
 			//if (XComHQ.Squad[SquadIndex].ObjectID == UnitRef.ObjectID)
 				//return SlotIndex;
 		//}
@@ -285,7 +285,7 @@ simulated function UpdateNavHelp()
 }
 
 simulated function OnContinue()
-{		
+{
 	local bool HasBackRowSoldiers;
 	local int idx;
 
@@ -330,18 +330,18 @@ simulated function OnContinue()
 }
 
 simulated function OnBack()
-{	
+{
 	m_bBackRowActive = false;
 	UpdateNavHelp();
 	m_kSlotList2.Hide();
 	m_kSlotList.Show();
 	`HQPRES.CAMLookAtNamedLocation(UIDisplayCam_Default, CameraTransitionTime);
-	
+
 }
 
 //simulated function bool OnUnrealCommand(int cmd, int arg)
 //{
-	//local bool bHandled;	
+	//local bool bHandled;
 //
 	//// Only pay attention to presses or repeats; ignoring other input types
 	//// NOTE: Ensure repeats only occur with arrow keys
@@ -362,7 +362,7 @@ simulated function OnBack()
 		//case class'UIUtilities_Input'.const.FXS_KEY_ESCAPE:
 		//case class'UIUtilities_Input'.const.FXS_R_MOUSE_DOWN:
 			//if( bRecievedShowHUDRemoteEvent )
-			//{				
+			//{
 				////Only process continue once the player has seen the HUD
 				//OnContinue();
 			//}
@@ -388,7 +388,7 @@ simulated function OnReceiveFocus()
 	UpdateNavHelp();
 	UpdateData();
 	if(m_bBackRowActive)
-		`HQPRES.CAMLookAtNamedLocation(UIDisplayCam_Back, 0.0f);  
+		`HQPRES.CAMLookAtNamedLocation(UIDisplayCam_Back, 0.0f);
 	else
 		`HQPRES.CAMLookAtNamedLocation(UIDisplayCam_Default, 0.0f);
 }
@@ -403,7 +403,7 @@ simulated function OnReceiveFocus()
 //{
 	//super(UIScreen).OnRemoved();
 	//WorldInfo.RemoteEventListeners.RemoveItem(self);
-	//ClearPawns();	
+	//ClearPawns();
 //}
 
 //------------------------------------------------------
@@ -474,7 +474,7 @@ simulated function XComUnitPawn CreatePawn(StateObjectReference UnitRef, int ind
 		UnitPawn = UnitState.CreatePawn(self, ZeroVec, ZeroRot); //Create a throw-away pawn
 		UnitPawn.CreateVisualInventoryAttachments(none, UnitState); // spawn weapons and other visible equipment
 	}
-		
+
 	return UnitPawn;
 }
 
@@ -503,11 +503,11 @@ simulated function XComUnitPawn CreatePawn(StateObjectReference UnitRef, int ind
 		//{
 			//UnitPawns[i] = NewPawn;
 		//}
-	//}	
+	//}
 //}
 
 //simulated function name GetPawnLocationTag(StateObjectReference UnitRef, optional string PawnLocationItentifier = m_strPawnLocationIdentifier)
-//{	
+//{
 	//local int i;
 //
 	//for(i = 0; i < XComHQ.Squad.Length; ++i)
@@ -684,7 +684,7 @@ simulated function PointInSpace GetPlacementActor(name PawnLocationTag)
 				//UnitPawns[PawnIndex].EnableFootIK(false);
 				//UnitPawns[PawnIndex].SetVisible(true);
 //
-				//HumanPawn = XComHumanPawn(UnitPawns[PawnIndex]);	
+				//HumanPawn = XComHumanPawn(UnitPawns[PawnIndex]);
 				//if(HumanPawn != none)
 				//{
 					//HumanPawn.GotoState('SquadLineup_Walkup');
@@ -751,7 +751,7 @@ DefaultProperties
 	InputState = eInputState_Consume;
 	bHideOnLoseFocus = true;
 	bAutoSelectFirstNavigable = false;
-	
+
 	m_strPawnLocationIdentifier = "Blueprint_AfterAction_Promote";
 	m_strPawnLocationSlideawayIdentifier = "UIPawnLocation_SlideAway_";
 

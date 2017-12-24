@@ -6,7 +6,7 @@
 
 class LWSpawnUnitFromAvenger extends Object;
 
-`include(LW_Toolbox\Src\LW_Toolbox.uci)
+`include(LWOTC_Toolbox\Src\LW_Toolbox.uci)
 
 var XComGameState_Unit SpawnedUnit;
 
@@ -192,7 +192,6 @@ static function GetValidFloorLocations(out array<Vector> FloorPoints, XComGroupS
 		else
 			Height ++;
 
-		Toggle = !Toggle;		
+		Toggle = !Toggle;
 	}
 }
-
