@@ -7,14 +7,23 @@ class X2StrategyGameRulesetDataStructures_LW extends X2StrategyGameRulesetDataSt
 
 `include(LWOTC_Toolbox\Src\LW_Toolbox.uci)
 
-static function int GetMaxSoldiersAllowedOnMission(optional MissionDefinition Mission)
+// Input argument changed in WOTC
+static function int GetMaxSoldiersAllowedOnMission(optional XComGameState_MissionSite MissionSite = none)
 {
 	local XComGameState_HeadquartersXCom XComHQ;
 	local XComGameStateHistory History;
+	local MissionDefinition Mission;
+	local X2SitRepEffect_SquadSize SitRepEffect;
 	local int Max;
 
 	History = `XCOMHISTORY;
 	XComHQ = XComGameState_HeadquartersXCom(History.GetSingleGameStateObjectForClass(class'XComGameState_HeadquartersXCom', true));
+
+	// Added in for LWOTC
+	if(MissionSite != none)
+	{
+		Mission = MissionSite.GeneratedMission.Mission;
+	}
 
 	if( Mission.MaxSoldiers > 0 )
 	{
@@ -38,6 +47,22 @@ static function int GetMaxSoldiersAllowedOnMission(optional MissionDefinition Mi
 	if( XComHQ != None && XComHQ.TacticalGameplayTags.Find('ExtraSoldier_Intel') != INDEX_NONE )
 	{
 		++Max;
+	}
+
+	// Added in for LWOTC
+	// check if we have any sitreps that modify the size of the squad
+	if( MissionSite != none )
+	{
+		foreach class'X2SitRepTemplateManager'.static.IterateEffects(class'X2SitrepEffect_SquadSize', SitRepEffect, MissionSite.GeneratedMission.SitReps)
+		{
+			if(SitRepEffect.MaxSquadSize > 0)
+			{
+				MaxSquad = min(MaxSquad, SitRepEffect.MaxSquadSize);
+			}
+
+			// add in the relative adjustment value, but make sure we have at least one unit
+			MaxSquad = Max(1, MaxSquad + SitRepEffect.SquadSizeAdjustment);
+		}
 	}
 
 	return Max;

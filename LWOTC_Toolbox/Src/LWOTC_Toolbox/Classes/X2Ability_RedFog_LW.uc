@@ -41,9 +41,9 @@ static function X2AbilityTemplate CreateRedFogAbility()
 	Template.eAbilityIconBehaviorHUD = EAbilityIconBehavior_NeverShow;
 	//Template.eAbilityIconBehaviorHUD = EAbilityIconBehavior_AlwaysShow;
 	Template.Hostility = eHostility_Neutral;
-	
+
 	RedFogEffect = new class'X2Effect_RedFog_LW';
-	RedFogEffect.BuildPersistentEffect(1, true, true, true, eGameRule_PlayerTurnBegin); 
+	RedFogEffect.BuildPersistentEffect(1, true, true, true, eGameRule_PlayerTurnBegin);
 	//RedFogEffect.SetDisplayInfo	(ePerkBuff_Penalty, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage,, "img:///UILibrary_LWToolbox.Status_RedFog", Template.AbilitySourceName);
 	RedFogEffect.SetDisplayInfo	(ePerkBuff_Penalty, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage,, "", Template.AbilitySourceName);
 	RedFogEffect.bCanTickEveryAction = true;
@@ -51,7 +51,7 @@ static function X2AbilityTemplate CreateRedFogAbility()
 	RedFogEffect.EffectTickedVisualizationFn = RedFogVisualization;
 	RedFogEffect.EffectRemovedVisualizationFn = RedFogVisualization;
 	//RedFogEffect.EffectHierarchyValue = 1;
-	
+
 	Template.AddTargetEffect(RedFogEffect);
 
 	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
@@ -59,8 +59,8 @@ static function X2AbilityTemplate CreateRedFogAbility()
 
 	return Template;
 }
-
-static function RedFogVisualization (XComGameState VisualizeGameState, out VisualizationTrack BuildTrack, const name EffectApplyResult)
+// LWOTC - VisualizationTrack change to VisualizationActionMetadata
+static function RedFogVisualization (XComGameState VisualizeGameState, out VisualizationActionMetadata BuildTrack, const name EffectApplyResult)
 {
     local XComGameState_Unit UnitState;
 

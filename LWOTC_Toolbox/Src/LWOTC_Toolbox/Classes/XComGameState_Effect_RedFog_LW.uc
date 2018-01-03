@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------------
 //  FILE:    XComGameState_Effect_RedFog_LW.uc
 //  AUTHOR:  Amineri (Long War Studios)
-//  PURPOSE: This is a component extension for Effect GameStates, containing 
+//  PURPOSE: This is a component extension for Effect GameStates, containing
 //				additional data used for RedFog.
 //---------------------------------------------------------------------------------------
 class XComGameState_Effect_RedFog_LW extends XComGameState_BaseObject
@@ -30,12 +30,12 @@ function XComGameState_Effect GetOwningEffect(optional XComGameState GameState)
 		return XComGameState_Effect(`XCOMHISTORY.GetGameStateForObjectID(OwningObjectId));
 }
 
-function OnEndTacticalPlay()
+function OnEndTacticalPlay(XComGameState NewGameState)
 {
 	local X2EventManager EventManager;
 	local Object ThisObj;
 
-	super.OnEndTacticalPlay();
+	super.OnEndTacticalPlay(NewGameState);
 
 	EventManager = `XEVENTMGR;
 	ThisObj = self;
@@ -59,7 +59,7 @@ function RegisterEvent(optional XComGameState_Unit TargetUnit)
 	}
 
 	// allows activation/deactivation of effect
-	`XEVENTMGR.RegisterForEvent(ListenerObj, 'UpdateRedFogActivation', UpdateActivation, ELD_OnStateSubmitted,,TargetUnit); 
+	`XEVENTMGR.RegisterForEvent(ListenerObj, 'UpdateRedFogActivation', UpdateActivation, ELD_OnStateSubmitted,,TargetUnit);
 }
 
 function EventListenerReturn UpdateActivation(Object EventData, Object EventSource, XComGameState GameState, Name EventID)
@@ -95,7 +95,7 @@ function EventListenerReturn UpdateActivation(Object EventData, Object EventSour
 		UpdatedEffectState.bIsActive = true;
 		UpdatedEffectState.UpdateRedFogPenalties(UpdatedUnitState, NewGameState);
 	}
-	else 
+	else
 	{
 		`TBTRACE("ActivateForXCom Listener: Setting inactive, unregistering events");
 		UpdatedEffectState.bIsActive = false;
@@ -153,7 +153,7 @@ simulated function UpdateRedFogPenalties(XComGameState_Unit UnitState, XComGameS
 	local array<RedFogPenalty> RFPenalties;
 	local XComGameState_LWToolboxOptions ToolboxOptions;
 	local array<StatChange>	aStatChanges;
-	
+
 	ToolboxOptions = class'XComGameState_LWToolboxOptions'.static.GetToolboxOptions();
 	OwningEffect = GetOwningEffect(GameState);
 	OwningEffect = XComGameState_Effect(GameState.CreateStateObject(OwningEffect.Class, OwningEffect.ObjectID));
@@ -183,7 +183,7 @@ simulated function UpdateRedFogPenalties(XComGameState_Unit UnitState, XComGameS
 			NewChange.ModOp = ToolboxOptions.GetRedFogPenaltyType(); //class'X2Effect_RedFog_LW'.default.RedFogPenaltyType;
 			switch(NewChange.ModOp)
 			{
-			case MODOP_Multiplication : 
+			case MODOP_Multiplication :
 				NewChange.StatAmount = 1.0 - ComputeStatLoss(PctHPLost, Penalty, ToolboxOptions.bRedFogLinearPenalties);
 				break;
 			default: // MODOP_Addition
@@ -210,7 +210,7 @@ simulated function float ComputeStatLoss(float PctHPLost, RedFogPenalty Penalty,
 	if(bLinear)
 		StatLoss = int(Penalty.MaxPenalty * PctHPLost);
 	else
-		StatLoss = int((QuadraticTerm * PctHPLost * PctHPLost) + (Penalty.InitialRate * PctHPLost)); 
+		StatLoss = int((QuadraticTerm * PctHPLost * PctHPLost) + (Penalty.InitialRate * PctHPLost));
 
 	`TBDEBUG("XCGS_Effect_RedFog: PctHPLost=" $ PctHPLost $ ", Stat=" $ Penalty.Stat $ ", Amount=" $ StatLoss,, 'LW_Toolbox');
 	return StatLoss;
@@ -220,7 +220,7 @@ simulated function float ComputePctHPLost(XComGameState_Unit UnitState)
 {
 	local float CalcHP, MaxHP, ReturnPct;
 	local XComGameState_LWToolboxOptions ToolboxOptions;
-	
+
 	ToolboxOptions = class'XComGameState_LWToolboxOptions'.static.GetToolboxOptions();
 
 	if(class'X2Effect_RedFog_LW'.default.TypesImmuneToRedFog.Find(UnitState.GetMyTemplateName()) != -1)
@@ -228,10 +228,10 @@ simulated function float ComputePctHPLost(XComGameState_Unit UnitState)
 
 	switch(ToolboxOptions.GetRedFogHealingType())
 	{
-	case eRFHealing_CurrentHP:  CalcHP = UnitState.GetCurrentStat(eStat_HP); break; 
-	case eRFHealing_LowestHP:  CalcHP = UnitState.LowestHP; break; 
-	case eRFHealing_AverageHP:  CalcHP = (UnitState.GetCurrentStat(eStat_HP) + UnitState.LowestHP)/2.0; break; 
-	default:  CalcHP = UnitState.GetCurrentStat(eStat_HP); break; 
+	case eRFHealing_CurrentHP:  CalcHP = UnitState.GetCurrentStat(eStat_HP); break;
+	case eRFHealing_LowestHP:  CalcHP = UnitState.LowestHP; break;
+	case eRFHealing_AverageHP:  CalcHP = (UnitState.GetCurrentStat(eStat_HP) + UnitState.LowestHP)/2.0; break;
+	default:  CalcHP = UnitState.GetCurrentStat(eStat_HP); break;
 	}
 
 	MaxHP = UnitState.HighestHP;

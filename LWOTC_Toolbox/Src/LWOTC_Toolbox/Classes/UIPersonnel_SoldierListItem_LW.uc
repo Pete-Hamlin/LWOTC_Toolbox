@@ -18,11 +18,11 @@ var UIImage AimIcon, DefenseIcon;
 var UIText AimValue, DefenseValue;
 
 //icons to be shown in the name area
-var UIImage HealthIcon, MobilityIcon, WillIcon, HackIcon, DodgeIcon; 
+var UIImage HealthIcon, MobilityIcon, WillIcon, HackIcon, DodgeIcon;
 var UIText HealthValue, MobilityValue, WillValue, HackValue, DodgeValue;
 
 //replacement for the soldier name so that it can be lined up to match the class name in font/position, and made horizontal autoscrolling
-var UIScrollingText SoldierNameText; 
+var UIScrollingText SoldierNameText;
 
 //replacement for the classname text so it can be shifted up to make room for icons
 var UIScrollingText ClassNameText;
@@ -53,10 +53,10 @@ simulated function UIButton SetDisabled(bool disabled, optional string TooltipTe
 simulated function UpdateData()
 {
 	local XComGameState_Unit Unit;
-	local string UnitLoc, status, statusTimeLabel, statusTimeValue, classIcon, rankIcon, flagIcon;	
+	local string UnitLoc, status, statusTimeLabel, statusTimeValue, classIcon, rankIcon, flagIcon;
 	local int iRank;
 	local X2SoldierClassTemplate SoldierClass;
-	
+
 	Unit = XComGameState_Unit(`XCOMHISTORY.GetGameStateForObjectID(UnitRef.ObjectID));
 
 	// trigger now to add background elements
@@ -96,9 +96,12 @@ simulated function UpdateData()
 					statusTimeValue $"\n" $ Class'UIUtilities_Text'.static.CapsCheckForGermanScharfesS(Class'UIUtilities_Text'.static.GetSizedText( statusTimeLabel, 12)),
 					UnitLoc,
 					flagIcon,
-					IsDisabled,  
+					IsDisabled,
 					Unit.ShowPromoteIcon(),
-					false); // psi soldiers can't rank up via missions
+					false, // psi soldiers can't rank up via missions
+					// Added in WOTC
+					mentalStatus,
+					BondLevel);
 
 	if(GetLanguage() == "JPN")
 	{
@@ -113,7 +116,7 @@ simulated function UpdateData()
 		SoldierNameText = Spawn(class'UIScrollingText', self);
 		SoldierNameText.bAnimateOnInit = false;
 		SoldierNameText.InitScrollingText(,, 330, 174, 0);
-	} 
+	}
 	if(GetLanguage() == "JPN") SoldierNameText.SetY(-3);
 	SoldierNameText.SetHtmlText(class'UIUtilities_Text'.static.GetColoredText(strUnitName, UIState));
 
@@ -122,7 +125,7 @@ simulated function UpdateData()
 		ClassNameText = Spawn(class'UIScrollingText', self);
 		ClassNameText.bAnimateOnInit = false;
 		ClassNameText.InitScrollingText(,, 120, 603, 0);
-	} 
+	}
 	if(GetLanguage() == "JPN") ClassNameText.SetY(-3);
 	ClassNameText.SetHtmlText(class'UIUtilities_Text'.static.GetColoredText(strClassName, UIState));
 
@@ -135,7 +138,7 @@ simulated function UpdateData()
 
 function AddNameColumnIcons(XComGameState_Unit Unit)
 {
-//var UIImage HealthIcon, MobilityIcon, WillIcon, HackIcon, DodgeIcon; 
+//var UIImage HealthIcon, MobilityIcon, WillIcon, HackIcon, DodgeIcon;
 	//Texture2D'UILibrary_LWToolbox.StatIcons.Image_Dodge'
 	//Texture2D'UILibrary_LWToolbox.StatIcons.Image_Hacking'
 	//Texture2D'UILibrary_LWToolbox.StatIcons.Image_Health'
@@ -156,7 +159,7 @@ function AddNameColumnIcons(XComGameState_Unit Unit)
 		HealthValue = Spawn(class'UIText', self);
 		HealthValue.bAnimateOnInit = false;
 		HealthValue.InitText().SetPosition(IconXPos + IconToValueOffsetX, IconYPos + IconToValueOffsetY);
-	
+
 	}
 	HealthValue.SetHtmlText(class'UIUtilities_Text'.static.GetColoredText(string(int(Unit.GetCurrentStat(eStat_HP))), UIState));
 
@@ -313,18 +316,20 @@ simulated function UpdateDisabled()
 }
 
 simulated function AS_UpdateDataSoldier(string UnitName,
-								 string UnitNickname, 
-								 string UnitRank, 
-								 string UnitRankPath, 
-								 string UnitClass, 
-								 string UnitClassPath, 
-								 string UnitStatus, 
-								 string UnitStatusValue, 
-								 string UnitLocation, 
+								 string UnitNickname,
+								 string UnitRank,
+								 string UnitRankPath,
+								 string UnitClass,
+								 string UnitClassPath,
+								 string UnitStatus,
+								 string UnitStatusValue,
+								 string UnitLocation,
 								 string UnitCountryFlagPath,
-								 bool bIsDisabled, 
-								 bool bPromote, 
-								 bool bPsiPromote)
+								 bool bIsDisabled,
+								 bool bPromote,
+								 bool bPsiPromote,
+								 string UnitMentalState,
+								 int BondLevel)
 {
 	MC.BeginFunctionOp("UpdateData");
 	MC.QueueString(UnitName);
@@ -340,6 +345,8 @@ simulated function AS_UpdateDataSoldier(string UnitName,
 	MC.QueueBoolean(bIsDisabled);
 	MC.QueueBoolean(bPromote);
 	MC.QueueBoolean(bPsiPromote);
+	MC.QueueString(UnitMentalState);
+	mc.QueueNumber(BondLevel);
 	MC.EndOp();
 }
 
@@ -365,7 +372,7 @@ simulated function OnMouseEvent(int Cmd, array<string> Args)
 //intercepts the base game call to GetPersonnelStatusSeparate to handle replaced UISquadSelect and provide hooks for other mod custom update status
 function GetPersonnelStatusSeparateWrapper(XComGameState_Unit Unit, out string Status, out string TimeLabel, out string TimeValue, optional int MyFontSize = -1)
 {
-	local EUIState eState; 
+	local EUIState eState;
 	local XComGameState_HeadquartersXCom HQState;
 	//local XComGameState_LWToolboxOptions ToolboxOptions;
 	//local delegate<GetPersonnelStatus> fnGetPersonnelStatus;
